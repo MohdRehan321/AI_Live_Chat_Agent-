@@ -81,7 +81,7 @@ await prisma.message.create({
     const messagesForLlm = recentMessages.reverse();
 
     // 3. Call LLM
-    const aiReply = await generateReply(messagesForLlm);
+    const aiReply = await generateReply(messagesForLlm as any);
 
 // 4. Save AI Message
 await prisma.message.create({
