@@ -1,4 +1,5 @@
-import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { FormEvent, KeyboardEvent } from "react";
 import "./App.css";
 
 type Sender = "user" | "ai";
@@ -33,7 +34,7 @@ type ChatResponse = {
   response?: string;
 };
 
-const API_BASE_URL = " https://ai-live-chat-agent-imth.onrender.com";
+const API_BASE_URL = "https://ai-live-chat-agent-imth.onrender.com";
 const SESSION_STORAGE_KEY = "chat_sessionId";
 
 function normalizeHistory(data: HistoryResponse): Message[] {
