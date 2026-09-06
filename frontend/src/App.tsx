@@ -33,7 +33,7 @@ type ChatResponse = {
   response?: string;
 };
 
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = " https://ai-live-chat-agent-imth.onrender.com";
 const SESSION_STORAGE_KEY = "chat_sessionId";
 
 function normalizeHistory(data: HistoryResponse): Message[] {
