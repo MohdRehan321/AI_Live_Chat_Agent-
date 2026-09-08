@@ -55,22 +55,26 @@ app.post("/chat/message", async (req, res) => {
   const trimmedMessage = message.trim();
 
   try {
-    const conversation = (sessionId && typeof sessionId === "string")
-      ? await prisma.conversation.findUnique({ where: { id: sessionId } })
-      : await prisma.conversation.create({ data: {} });
+    let conversation = null;
 
-    if (!conversation) {
-      return res.status(404).json({ error: "Conversation not found" });
+    // 1. Try to find the existing conversation
+    if (sessionId && typeof sessionId === "string") {
+      conversation = await prisma.conversation.findUnique({ where: { id: sessionId } });
     }
 
-      // 1. Save User Message
-await prisma.message.create({
-  data: {
-    content: trimmedMessage,
-    sender: "user", 
-    conversationId: conversation.id,
-  },
-});
+    // 2. If no session was provided, OR the database was wiped and it wasn't found, create a new one
+    if (!conversation) {
+      conversation = await prisma.conversation.create({ data: {} });
+    }
+
+    // 1. Save User Message
+    await prisma.message.create({
+      data: {
+        content: trimmedMessage,
+        sender: "user", 
+        conversationId: conversation.id,
+      },
+    });
 
     // 2. Fetch History for LLM
     const recentMessages = await prisma.message.findMany({
@@ -83,14 +87,14 @@ await prisma.message.create({
     // 3. Call LLM
     const aiReply = await generateReply(messagesForLlm as any);
 
-// 4. Save AI Message
-await prisma.message.create({
-  data: {
-    content: aiReply,
-    sender: "ai", 
-    conversationId: conversation.id,
-  },
-});
+    // 4. Save AI Message
+    await prisma.message.create({
+      data: {
+        content: aiReply,
+        sender: "ai", 
+        conversationId: conversation.id,
+      },
+    });
 
     // 5. Final Return
     return res.status(200).json({
